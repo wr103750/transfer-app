@@ -1,14 +1,12 @@
-const { app, BrowserWindow } = require('electron')
-const { Menu, MenuItem,dialog} = require('electron')
+const { app, BrowserWindow } = require('electron');
+const { Menu, MenuItem,dialog} = require('electron');
 const ipcMain = require('electron').ipcMain;
-const { Notification } = require('electron')
-const http_ningmengyun = require('./http_ningmengyun.js')
-const http_kdzwy = require('./http_kdzwy')
+const { Notification } = require('electron');
+const http_ningmengyun = require('./http_ningmengyun.js');
+const http_kdzwy = require('./http_kdzwy');
+const http_suiyue = require("./js/http_suiyue");
 // 在文件头部引入 Node.js 中的 path 模块
 const path = require('path')
-var http = require('http');
-var fs = require('fs');
-var url = require('url');
 
 // 修改现有的 createWindow() 函数
 function createWindow () {
@@ -17,11 +15,11 @@ function createWindow () {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration:true
+      //nodeIntegration:true
     }
   });
 
-  win.loadFile('index.html');
+  win.loadFile('login.html');
   let content = win.webContents;
 
   //菜单
@@ -37,6 +35,15 @@ function createWindow () {
     }]
   }));
   Menu.setApplicationMenu(menu);
+
+  //页面切换
+  ipcMain.on("change-page",function (event,page){
+    win.loadFile(page);
+  });
+  //登录
+  ipcMain.on("login",function(event,username,password){
+    http_suiyue.login(username,password,win);
+  });
 }
 
 app.whenReady().then(() => {

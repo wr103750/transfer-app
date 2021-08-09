@@ -7,17 +7,13 @@ const element = document.getElementById(selector)
 if (element) element.innerText = text
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById("b_dialog").onclick=function (){
-        ipcRenderer.send("dialog-message","弹窗");
-    }
-})
+
 
 contextBridge.exposeInMainWorld('context', {
     desktop: true,
     doThing: () => ipcRenderer.send('do-a-thing'),
-    accountTest:(username,password,platform) => ipcRenderer.send("accountTest",username,password,platform)
+    accountTest:(username,password,platform) => ipcRenderer.send("accountTest",username,password,platform),
+    login:(username,password) => ipcRenderer.send("login",username,password),
+    dialog:(message) => ipcRenderer.send("dialog-message",message),
+    changePage:(page) => ipcRenderer.send("change-page",page)
 })
-ipcRenderer.on('asynchronous-reply', function(event, arg) {
-    console.log(arg); // prints "pong"
-});
