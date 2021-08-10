@@ -1,15 +1,18 @@
 const http = require("http");
+let crypto = require('crypto');
 let querystring = require('querystring');
-exports.login = function (username,password,win){
+const data = require("./data");
+exports.login = function (username,password,win,event){
     let post_option = {
         hostname: '116.63.222.203',
         port: 18001,
         path: '/api/auth/jwt/token',
         method: 'POST'
     };
+    let md5pwd = crypto.createHash("md5").update(password).digest("hex")
     let post_data = querystring.stringify({
-        username:"15802732168",
-        password:"df10ef8509dc176d733d59549e7dbfaf"
+        username:username,
+        password:md5pwd
     });
     post_option.headers = {
         'Content-Type' : 'application/x-www-form-urlencoded'
@@ -21,7 +24,10 @@ exports.login = function (username,password,win){
             let bodyObj = JSON.parse(body);
             if(!bodyObj.success){
                 console.log(bodyObj.message);
+                event.reply("show_hide_msg","show_hide_msg","visible");
             }else {
+                data.userinfo = bodyObj;
+                event.reply("show_hide_msg","show_hide_msg","hidden");
                 win.loadFile("index.html")
             }
         })

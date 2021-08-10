@@ -5,12 +5,15 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
     <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
     <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
 </head>
 <h1>登录岁月会计云</h1>
 <body>
-用户名：<input name="username" type="text" id="i_username"> 密码:<input name="password" type="password" id="i_password">
+用户名：<input name="username" type="text" id="i_username" value="15802732168">
+密码:<input name="password" type="password" id="i_password" value="123456abc">
 <input type="button" value="登录" id="b_login">
+<p class="error_msg" id="show_hide_msg">用户名或者密码不正确</p>
 <script src="jquery-3.6.0.js"></script>
-<script src="js/login_renderer.js"></script>
+<script src="render/login_renderer.js"></script>
 </body>
 </html>

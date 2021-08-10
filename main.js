@@ -5,8 +5,9 @@ const { Notification } = require('electron');
 const http_ningmengyun = require('./http_ningmengyun.js');
 const http_kdzwy = require('./http_kdzwy');
 const http_suiyue = require("./js/http_suiyue");
+const data = require("./js/data.js");
 // 在文件头部引入 Node.js 中的 path 模块
-const path = require('path')
+const path = require('path');
 
 // 修改现有的 createWindow() 函数
 function createWindow () {
@@ -14,13 +15,14 @@ function createWindow () {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.js')
       //nodeIntegration:true
     }
   });
 
   win.loadFile('login.html');
   let content = win.webContents;
+  content.executeJavaScript()
 
   //菜单
   const menu = new Menu()
@@ -42,7 +44,7 @@ function createWindow () {
   });
   //登录
   ipcMain.on("login",function(event,username,password){
-    http_suiyue.login(username,password,win);
+    http_suiyue.login(username,password,win,event);
   });
 }
 
@@ -51,12 +53,6 @@ app.whenReady().then(() => {
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   });
-  const NOTIFICATION_TITLE = 'Basic Notification'
-  const NOTIFICATION_BODY = 'Notification from the Main process'
-  function showNotification () {
-    new Notification({ title: NOTIFICATION_TITLE, body: NOTIFICATION_BODY }).show()
-  }
-
 })
 
 app.on('window-all-closed', function () {

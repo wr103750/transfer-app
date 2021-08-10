@@ -17,3 +17,8 @@ contextBridge.exposeInMainWorld('context', {
     dialog:(message) => ipcRenderer.send("dialog-message",message),
     changePage:(page) => ipcRenderer.send("change-page",page)
 })
+
+//显示或者隐藏错误信息
+ipcRenderer.on("show_hide_msg",function (event,selector,action){
+    document.getElementById(selector).style.visibility = action;
+});
