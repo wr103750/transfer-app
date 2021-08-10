@@ -1,7 +1,7 @@
 const https = require("https");
 const iconv = require("iconv-lite");
 const querystring = require('querystring');
-var util = require('./util')
+let util = require('./util')
 /**
  * 金碟帐无忧接口调用
  */
@@ -10,7 +10,7 @@ exports.login = function (username,password){
     let post_option = {
         hostname: 'www.kdzwy.com',
         port: 443,
-        path: '/bs/guanjia/login?username=13040847220&password=wXPUHQz4c7iyyk5sokR1CQ%3D%3D&captcha=&encode=1&checkCaptcha=false&redirectUri=https%3A%2F%2Fgj.kdzwy.com',
+        path: '/bs/guanjia/login?username=' + username + '&password=' + password + '&captcha=&encode=1&checkCaptcha=false&redirectUri=https%3A%2F%2Fgj.kdzwy.com',
         method: 'POST'
     };
     post_option.headers = {

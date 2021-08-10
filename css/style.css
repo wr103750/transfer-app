@@ -2,3 +2,6 @@
     color:red;
     visibility: hidden;
 }
+.c_parameter_area{
+    display: none;
+}

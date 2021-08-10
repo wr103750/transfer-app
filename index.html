@@ -5,21 +5,38 @@
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
     <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>Hello World!</title>
+    <title>选择第三方财务软件</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
 <h1>岁月会计云导账工具</h1>
-
+<h2>设置第三方财务软件参数</h2>
 <span id="span_login">
-    账号:<input name="username" type="text" id="i_username"> 密码:<input name="password" type="password" id="i_password">
-    <input type="button" value="金碟帐无忧" id="b_ceshi_kd">
-    <input type="button" value="柠檬云" id="b_ceshi_nmy"><br/>
-    <input type="button" value="dialog" id="b_dialog"><br/>
+    财务软件：
+    <select id="soft_company">
+        <option>金碟</option>
+        <option>柠檬云</option>
+    </select>
+    <select id="soft_product">
+
+    </select>
+    <br/>
+    <span id="span_kd_login" class="c_parameter_area">
+        账号:<input name="username" type="text" id="i_username" value="13040847220">
+        密码:<input name="password" type="password" id="i_password" value="aa123456aa">
+        <input type="button" value="测试" id="b_ceshi_kd">
+        <input type="button" value="dialog" id="b_dialog"><br/>
+    </span>
 </span>
 <span id="span_select">
     <input type="button" value="上一步" id="b_prev">
 </span>
 <script src="jquery-3.6.0.js"></script>
-<script src="./renderer.js"></script>
+<script src="./render/index.js"></script>
+<script src="./render/tripledes.js"></script>
+<script src="./render/des.js"></script>
+<script src="./render/enc-base64.js"></script>
+<script src="./render/mode-ecb.js"></script>
+
 </body>
 </html>
