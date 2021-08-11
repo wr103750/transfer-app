@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <span id="s_account_set">
+        选择第三方财务软件账套:<br/>
+        <input type="text" id="i_account_set_search"><br/>
+        <span id="s_account_set_checkbox">
+        </span>
+    </span>
+    <span>
+        选择导入的信息：
+        会计准则：<input type="radio" name="accounting_principle" value="1">小企业会计准则 <input type="radio" name="accounting_principle" value="2">企业会计准则<br/>
+        增值税种类:<input type="radio" name="tax_category" value="1">小规模纳税人<input type="radio" name="tax_category" value="2">一般纳税人
+    </span>
+    <button value="">导入</button><br/>
+    <button value="" id="b_config_prev">上一步</button>
+    <script src="../jquery-3.6.0.js"></script>
+    <script src="../render/zwy_config.js"></script>
+</body>
+</html>

@@ -22,13 +22,11 @@ exports.login = function (username,password,win,event){
             console.log(buffer.toString());
             let body = buffer.toString();
             let bodyObj = JSON.parse(body);
-            if(!bodyObj.success){
-                console.log(bodyObj.message);
-                event.reply("show_hide_msg","show_hide_msg","visible");
+            if(bodyObj.success){
+                event.reply("login_msg","success");
+                win.loadFile("./html/index.html")
             }else {
-                data.userinfo = bodyObj;
-                event.reply("show_hide_msg","show_hide_msg","hidden");
-                win.loadFile("index.html")
+                event.reply("login_msg","error");
             }
         })
     });

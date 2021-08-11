@@ -1,11 +1,12 @@
 const https = require("https");
 const iconv = require("iconv-lite");
 const querystring = require('querystring');
+const data = require("./data")
 let util = require('./util')
 /**
  * 金碟帐无忧接口调用
  */
-exports.login = function (username,password){
+exports.login = function (username,password,win,event){
     var cookie;
     let post_option = {
         hostname: 'www.kdzwy.com',
@@ -19,13 +20,18 @@ exports.login = function (username,password){
     let post_req = https.request(post_option,function (res){
         cookie = res.headers['set-cookie'];
         console.log(cookie);
-        redirect(util.parseCookie(cookie));
+        if(cookie.length != 4){
+            event.reply("connect_msg","error");
+        }else{
+            event.reply("connect_msg","success");
+        }
+        //win.loadFile("html/zwy_config.html");
+        redirect(util.parseCookie(cookie),event);
     });
     post_req.write('');
     post_req.end();
 }
-function redirect(reqCookie){
-    let resCookie;
+function redirect(reqCookie,event){
     let post_option = {
         hostname: 'vip4.kdzwy.com',
         port: 443,
@@ -37,15 +43,14 @@ function redirect(reqCookie){
         Cookie : reqCookie
     };
     let post_req = https.request(post_option,function (res){
-        resCookie = res.headers['set-cookie'];
-        console.log(resCookie);
-        nodecustomer(util.parseCookie(resCookie));
+        data.kd_login_redirect_cookie = res.headers['set-cookie'];//保存登录重定向后的cookie信息
+        //nodecustomer(util.parseCookie(resCookie),event);
     });
     post_req.write('');
     post_req.end();
 }
 //账套列表
-function nodecustomer(reqCookie){
+exports.nodecustomer = function(reqCookie,event){
     let resCookie;
     let post_option = {
         hostname: 'vip4.kdzwy.com',
@@ -60,9 +65,18 @@ function nodecustomer(reqCookie){
     let post_req = https.request(post_option,function (res){
         resCookie = res.headers['set-cookie'];
         console.log(resCookie);
+        let rawData = '';
         res.on('data',function (buffer){
-            console.log(buffer.toString());
-        })
+            rawData = rawData + buffer;
+        });
+        res.on('end', () => {
+            try {
+                const parsedData = JSON.parse(rawData);
+                event.reply("show_kd_account_set",parsedData);
+            } catch (e) {
+              console.error(e.message);
+            }
+          });
     });
     post_req.write('');
     post_req.end();

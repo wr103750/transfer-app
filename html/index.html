@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
     <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
     <title>选择第三方财务软件</title>
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
 </head>
 <body>
 <h1>岁月会计云导账工具</h1>
@@ -25,18 +25,20 @@
         账号:<input name="username" type="text" id="i_username" value="13040847220">
         密码:<input name="password" type="password" id="i_password" value="aa123456aa">
         <input type="button" value="测试" id="b_ceshi_kd">
-        <input type="button" value="dialog" id="b_dialog"><br/>
+        <p class="success_msg" id="success_msg">连接成功</p>
+        <p class="error_msg" id="error_msg">连接失败</p>
     </span>
 </span>
 <span id="span_select">
     <input type="button" value="上一步" id="b_prev">
+    <input type="button" value="下一步" id="b_next" class="success_msg">
 </span>
-<script src="jquery-3.6.0.js"></script>
-<script src="./render/index.js"></script>
-<script src="./render/tripledes.js"></script>
-<script src="./render/des.js"></script>
-<script src="./render/enc-base64.js"></script>
-<script src="./render/mode-ecb.js"></script>
+<script src="../jquery-3.6.0.js"></script>
+<script src="../render/index.js"></script>
+<script src="../render/lib/tripledes.js"></script>
+<script src="../render/lib/des.js"></script>
+<script src="../render/lib/enc-base64.js"></script>
+<script src="../render/lib/mode-ecb.js"></script>
 
 </body>
 </html>

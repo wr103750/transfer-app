@@ -14,7 +14,10 @@ $(function(){
         window.context.accountTest(username,encrypt,"kd");
     });
     $("#b_prev").click(function (){
-        window.context.changePage("login.html");
+        window.context.changePage("html/login.html");
+    });
+    $("#b_next").click(function(){
+        window.context.kdzwyNext();//账号测试连接成功之后下一步
     });
     let soft_company = $("#soft_company");
     soft_company.change(companyChange);
@@ -23,10 +26,7 @@ $(function(){
     soft_company.change();
 });
 window.addEventListener('DOMContentLoaded', () => {
-    document.querySelector("#b_dialog").onclick=function (){
-        window.context.dialog("弹窗");
-    }
-})
+});
 
 //软件公司选择下拉框
 function companyChange() {

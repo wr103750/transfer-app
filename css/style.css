@@ -2,6 +2,10 @@
     color:red;
     visibility: hidden;
 }
+.success_msg{
+    color:green;
+    visibility: hidden;
+}
 .c_parameter_area{
     display: none;
 }
