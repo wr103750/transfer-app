@@ -1,19 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
     <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>Title</title>
+    <title>岁月云导账工具</title>
     <link rel="stylesheet" type="text/css" href="../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
 </head>
-<h1>登录岁月会计云</h1>
+
 <body>
-用户名：<input name="username" type="text" id="i_username" value="15802732168">
-密码:<input name="password" type="password" id="i_password" value="123456abc">
-<input type="button" value="登录" id="b_login">
-<p class="error_msg" id="show_hide_msg">用户名或者密码不正确</p>
-<script src="../jquery-3.6.0.js"></script>
-<script src="../render/login_renderer.js"></script>
+    <div class="container mt-4">
+        <form>
+            <h1>登录岁月会计云</h1>
+            <div class="mb-3">
+                <label class="form-label">用户名：</label>
+                <input name="username" type="text" id="i_username" value="15802732168" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">密码:</label>
+                <input name="password" type="password" id="i_password" value="123456abc" class="form-control">
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">记住</label>
+            </div>
+            <p class="error_msg" id="show_hide_msg">用户名或者密码不正确</p>
+            <input type="button" value="登录" id="b_login" class="btn btn-primary btn-lg">
+        </form>
+    </div>
+    <script src="../jquery-3.6.0.js"></script>
+    <script src="../render/login_renderer.js"></script>
 </body>
+
 </html>

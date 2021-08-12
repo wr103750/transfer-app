@@ -18,17 +18,21 @@ exports.login = function (username,password,win,event){
         'Content-Type' : 'application/x-www-form-urlencoded'
     };
     let post_req = http.request(post_option,function (res){
+        let rawData = '';
         res.on('data',function (buffer){
-            console.log(buffer.toString());
-            let body = buffer.toString();
-            let bodyObj = JSON.parse(body);
-            if(bodyObj.success){
+            rawData = rawData + buffer;
+        });
+        res.on('end',function(){
+            data.loginInfo = JSON.parse(rawData);
+            console.log("suiyue login info:",data.loginInfo);
+            if(data.loginInfo.success){
                 event.reply("login_msg","success");
-                win.loadFile("./html/index.html")
+                win.loadFile("./html/index.html");
             }else {
                 event.reply("login_msg","error");
+                win.loadFile("./html/index.html")
             }
-        })
+        });
     });
     post_req.write(post_data);
     post_req.end();

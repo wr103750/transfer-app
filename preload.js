@@ -2,10 +2,6 @@ var fs = require("fs");
 const { contextBridge } = require('electron')
 const ipcRenderer = require('electron').ipcRenderer;
 const remote = require('electron').remote;
-const replaceText = (selector, text) => {
-const element = document.getElementById(selector)
-if (element) element.innerText = text
-}
 
 contextBridge.exposeInMainWorld('context', {
     desktop: true,
@@ -14,17 +10,17 @@ contextBridge.exposeInMainWorld('context', {
     login:(username,password) => ipcRenderer.send("login",username,password),
     dialog:(message) => ipcRenderer.send("dialog-message",message),
     changePage:(page) => ipcRenderer.send("change-page",page),
-    kdzwyNext:() => ipcRenderer.send("kdzwy_next")
-})
+    kdzwyNext:() => ipcRenderer.send("kdzwy_next"),
+    initAccountSet:() => ipcRenderer.send("init_account_set"),
+    dataImport: (companyIds) => ipcRenderer.send("data_import",companyIds)
+});
 
 //显示或者隐藏登录错误信息，登录成功显示下一步
 ipcRenderer.on("login_msg",function (event,action){
     if(action === "success"){
-        document.getElementById("success_msg").style.visibility = "visible";
-        document.getElementById("error_msg").style.visibility = "hidden";
+        document.getElementById("show_hide_msg").style.visibility = "hidden";
     }else if(action === "error"){
-        document.getElementById("success_msg").style.visibility = "hidden";
-        document.getElementById("error_msg").style.visibility = "visible";
+        document.getElementById("show_hide_msg").style.visibility = "visible";
     }
 });
 
@@ -46,7 +42,7 @@ ipcRenderer.on("show_kd_account_set",function(event,data){
     let items = data.data.items;
     let html = "";
     for(let item of items){
-        html = html + '<input type="checkbox" name="account_set" value="' + item.companyId + '">' + item.companyName + '<br>';
+        html = html + `<div class="checkbox"><label><input type="checkbox" name="account_set" value="${item.companyId}" class="form-check-input">${item.companyName}</label></div>`;
     }
     let span = document.getElementById("s_account_set_checkbox");
     span.innerHTML = html;

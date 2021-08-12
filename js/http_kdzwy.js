@@ -6,7 +6,7 @@ let util = require('./util')
 /**
  * 金碟帐无忧接口调用
  */
-exports.login = function (username,password,win,event){
+exports.login = function (username, password, win, event) {
     var cookie;
     let post_option = {
         hostname: 'www.kdzwy.com',
@@ -15,23 +15,20 @@ exports.login = function (username,password,win,event){
         method: 'POST'
     };
     post_option.headers = {
-        'Content-Type' : 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded'
     };
-    let post_req = https.request(post_option,function (res){
+    let post_req = https.request(post_option, function (res) {
         cookie = res.headers['set-cookie'];
-        console.log(cookie);
-        if(cookie.length != 4){
-            event.reply("connect_msg","error");
-        }else{
-            event.reply("connect_msg","success");
-        }
-        //win.loadFile("html/zwy_config.html");
-        redirect(util.parseCookie(cookie),event);
+        console.log("kd_login cookie:",cookie);
+        redirect(util.parseCookie(cookie), event);
     });
     post_req.write('');
     post_req.end();
 }
-function redirect(reqCookie,event){
+/**
+ * 金碟账无忧登录重定向
+ */
+function redirect(reqCookie, event) {
     let post_option = {
         hostname: 'vip4.kdzwy.com',
         port: 443,
@@ -39,18 +36,23 @@ function redirect(reqCookie,event){
         method: 'GET'
     };
     post_option.headers = {
-        'Content-Type' : 'application/x-www-form-urlencoded',
-        Cookie : reqCookie
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Cookie: reqCookie
     };
-    let post_req = https.request(post_option,function (res){
-        data.kd_login_redirect_cookie = res.headers['set-cookie'];//保存登录重定向后的cookie信息
-        //nodecustomer(util.parseCookie(resCookie),event);
+    let post_req = https.request(post_option, function (res) {
+        data.kd_login_redirect_cookie = util.parseCookie(res.headers['set-cookie']);//保存登录重定向后的cookie信息
+        //重定向之后显示下一步按钮
+        if (data.kd_login_redirect_cookie) {
+            event.reply("connect_msg", "success");
+        } else {
+            event.reply("connect_msg", "error");
+        }
     });
     post_req.write('');
     post_req.end();
 }
 //账套列表
-exports.nodecustomer = function(reqCookie,event){
+exports.nodecustomer = function (event) {
     let resCookie;
     let post_option = {
         hostname: 'vip4.kdzwy.com',
@@ -59,25 +61,115 @@ exports.nodecustomer = function(reqCookie,event){
         method: 'GET'
     };
     post_option.headers = {
-        'Content-Type' : 'application/x-www-form-urlencoded',
-        Cookie : reqCookie
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Cookie: data.kd_login_redirect_cookie
     };
-    let post_req = https.request(post_option,function (res){
+    console.info("kd_login_redirect_cookie:",data.kd_login_redirect_cookie);
+    let post_req = https.request(post_option, function (res) {
         resCookie = res.headers['set-cookie'];
-        console.log(resCookie);
+        console.log("nodecuster cookie:",resCookie);
         let rawData = '';
-        res.on('data',function (buffer){
+        res.on('data', function (buffer) {
             rawData = rawData + buffer;
         });
         res.on('end', () => {
             try {
                 const parsedData = JSON.parse(rawData);
-                event.reply("show_kd_account_set",parsedData);
+                event.reply("show_kd_account_set", parsedData);
             } catch (e) {
-              console.error(e.message);
+                console.error(e.message);
             }
-          });
+        });
     });
     post_req.write('');
     post_req.end();
+}
+
+//获取账套url
+exports.getAccountUrl = function (event) {
+    let option = {
+        hostname: 'vip4.kdzwy.com',
+        port: 443,
+        path: '/guanjia/customer/accounturl?companyId=6398919',
+        method: 'GET'
+    }
+    option.headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Cookie: data.kd_login_redirect_cookie
+    };
+    let req = https.request(option, function (res) {
+        let resCookie = util.parseCookie(res.headers['set-cookie']);
+        console.log("account url cookie:", resCookie);
+        let rawData = '';
+        res.on('data', function (buffer) {
+            rawData = rawData + buffer;
+        });
+        res.on('end', () => {
+            try {
+                const parsedData = JSON.parse(rawData);
+                console.info(parsedData);
+                exports.entryAccount(resCookie, parsedData.data, event);
+            } catch (e) {
+                console.error(e.message);
+            }
+        });
+    });
+    req.write('');
+    req.end();
+}
+//进入账套
+exports.entryAccount = function (reqCookie, url, event) {
+    let option = { port: 34 };
+    option.headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Cookie: reqCookie
+    }
+    https.get(url, option, (res) => {
+        let location = res.headers['location'];
+        console.log("location:", location);
+        data.kd_current_account_cookie = util.parseCookie(res.headers['set-cookie']);
+        console.log("entry account cookie:", data.kd_current_account_cookie);
+        exports.accountRedirect(location,event);
+        res.on('data', (d) => {
+            process.stdout.write(d);
+        });
+
+    }).on('error', (e) => {
+        console.error(e);
+    });
+}
+//账套重定向
+exports.accountRedirect = function (url, event) {
+    let option = { port: 34 };
+    option.headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Cookie: data.kd_current_account_cookie
+    }
+    https.get(url, option, (res) => {
+        let cookie = util.parseCookie(res.headers['set-cookie']);
+        data.kd_current_account_cookie = data.kd_current_account_cookie + ";" + cookie;
+        console.log("current cookie:", data.kd_current_account_cookie);
+        exports.loadVoucher(event);
+        res.on('data', (d) => {
+            process.stdout.write(d);
+        });
+    }).on('error',(e) => {
+        console.error(e);
+    });
+}
+//查询凭证列表
+exports.loadVoucher = function(event){
+    let option = { port: 34 };
+    option.headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Cookie: data.kd_current_account_cookie
+    }
+    let url = "https://vip4.kdzwy.com:34/gl/voucher?m=findList&fromPeriod=202108&toPeriod=202108&_search=false&nd=1628771931403&rows=100&page=1&sidx=date&sord=asc";
+    https.get(url, option, (res) => {
+        res.on('data', (d) => {
+            process.stdout.write(d);
+        });
+    }).on('error',(e) => {
+        console.error(e);
+    });
 }

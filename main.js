@@ -13,8 +13,9 @@ const path = require('path');
 // 修改现有的 createWindow() 函数
 function createWindow () {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 800,
+    frame:true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
       //nodeIntegration:true
@@ -58,7 +59,14 @@ function createWindow () {
   //金碟账无忧测试成功后下一步
   ipcMain.on("kdzwy_next",function(event){
     win.loadFile("html/zwy_config.html");
-    http_kdzwy.nodecustomer(util.parseCookie(data.kd_login_redirect_cookie),event);
+  });
+  //金碟账无忧页面加载完成之后初始化账套数据
+  ipcMain.on("init_account_set",function(event){
+    http_kdzwy.nodecustomer(event);
+  });
+  //金碟账无忧数据导入
+  ipcMain.on("data_import",function(event,companyIds ){
+    http_kdzwy.getAccountUrl(event);
   });
 }
 

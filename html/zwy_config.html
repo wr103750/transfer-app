@@ -1,26 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>岁月云导账工具</title>
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
 </head>
+
 <body>
-    <span id="s_account_set">
-        选择第三方财务软件账套:<br/>
-        <input type="text" id="i_account_set_search"><br/>
-        <span id="s_account_set_checkbox">
-        </span>
-    </span>
-    <span>
-        选择导入的信息：
-        会计准则：<input type="radio" name="accounting_principle" value="1">小企业会计准则 <input type="radio" name="accounting_principle" value="2">企业会计准则<br/>
-        增值税种类:<input type="radio" name="tax_category" value="1">小规模纳税人<input type="radio" name="tax_category" value="2">一般纳税人
-    </span>
-    <button value="">导入</button><br/>
-    <button value="" id="b_config_prev">上一步</button>
+    <div class="container mt-4">
+        <div class="row">
+            <div id="s_account_set" class="col-md-5">
+                <h4>选择第三方财务软件账套</h2>
+                    <input type="text" id="i_account_set_search" class="form-control"><br />
+                    <div id="s_account_set_checkbox" class="pre-scrollable form-check">
+                    </div>
+            </div>
+            <div class="col-md-2">
+
+            </div>
+            <div id="config_select" class="col-md-5">
+                <h4>选择导入的信息</h2>
+                    <label class="form-check-label">会计准则：</label><br />
+                    <label>
+                        <input type="radio" name="accounting_principle" value="1">小企业会计准则
+                    </label>
+                    <label>
+                        <input type="radio" name="accounting_principle" value="2">企业会计准则
+                    </label>
+
+                    <label class="form-check-label">增值税种类:</label><br />
+                    <label>
+                        <input type="radio" name="tax_category" value="1">小规模纳税人
+                    </label>
+                    <label>
+                        <input type="radio" name="tax_category" value="2">一般纳税人
+                    </label>
+            </div>
+        </div>
+    </div>
+    <div id="config_button" class="container text-center">
+        <button value="" id="b_data_import" class="btn btn-primary">导入</button>
+        <button value="" id="b_config_prev" class="btn btn-primary">上一步</button>
+    </div>
     <script src="../jquery-3.6.0.js"></script>
     <script src="../render/zwy_config.js"></script>
 </body>
+
 </html>
