@@ -45,5 +45,5 @@ ipcRenderer.on("show_kd_account_set",function(event,data){
         html = html + `<div class="checkbox"><label><input type="checkbox" name="account_set" value="${item.companyId}" class="form-check-input">${item.companyName}</label></div>`;
     }
     let span = document.getElementById("s_account_set_checkbox");
-    span.innerHTML = html;
+    span.innerHTML = span.innerHTML + html;
 });

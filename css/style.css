@@ -9,3 +9,7 @@
 .c_parameter_area{
     display: none;
 }
+#s_account_set_checkbox{
+    height: 400px;
+    overflow: auto;
+}

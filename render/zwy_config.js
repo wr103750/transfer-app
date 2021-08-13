@@ -11,6 +11,10 @@ $(function(){
         $.each($("input[name=account_set]:checked"),function(index,val){
             companyIds.push($(val).val());
         });
+        if(companyIds.length == 0){
+            alert("请先选择账套");
+            return;
+        }
         window.context.dataImport(companyIds);
     });
 });

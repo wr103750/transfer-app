@@ -14,17 +14,16 @@ const path = require('path');
 function createWindow () {
   const win = new BrowserWindow({
     width: 1000,
-    height: 800,
+    height: 700,
     frame:true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
       //nodeIntegration:true
     }
   });
-
+  data.current_window = win;
   win.loadFile('./html/login.html');
   let content = win.webContents;
-  content.executeJavaScript()
 
   //菜单
   const menu = new Menu()
@@ -66,7 +65,8 @@ function createWindow () {
   });
   //金碟账无忧数据导入
   ipcMain.on("data_import",function(event,companyIds ){
-    http_kdzwy.getAccountUrl(event);
+    console.info(companyIds);
+    http_kdzwy.dataImport(event,companyIds);
   });
 }
 

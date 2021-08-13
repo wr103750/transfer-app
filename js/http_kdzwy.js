@@ -1,8 +1,9 @@
 const https = require("https");
 const iconv = require("iconv-lite");
 const querystring = require('querystring');
-const data = require("./data")
-let util = require('./util')
+const data = require("./data");
+let util = require('./util');
+const {dialog} = require("electron");
 /**
  * 金碟帐无忧接口调用
  */
@@ -85,8 +86,32 @@ exports.nodecustomer = function (event) {
     post_req.end();
 }
 
+//循环导入所有账套的数据
+exports.dataImport = function(event,companyIds){
+    exports.importOne(event,companyIds,0);
+}
+
+//导入单个套账数据
+exports.importOne = function(event,companyIds,index){
+    let promise = new Promise((resolve,reject) => {
+        try{
+            exports.getAccountUrl(event,companyIds,index,resolve,reject);
+            if(index < companyIds.length-1){
+                resolve(index + 1);
+            }
+        }catch(e){
+            log.error(e);
+        }
+    });
+    promise.then((data) =>{
+        exports.importOne(event,companyIds,data);
+    },(error)=>{
+        log.error(error);
+    })
+}
+
 //获取账套url
-exports.getAccountUrl = function (event) {
+exports.getAccountUrl = function (event,companyIds,index,resolve,reject) {
     let option = {
         hostname: 'vip4.kdzwy.com',
         port: 443,
@@ -108,7 +133,7 @@ exports.getAccountUrl = function (event) {
             try {
                 const parsedData = JSON.parse(rawData);
                 console.info(parsedData);
-                exports.entryAccount(resCookie, parsedData.data, event);
+                exports.entryAccount(resCookie, parsedData.data, event,companyIds,index,resolve,reject);
             } catch (e) {
                 console.error(e.message);
             }
@@ -118,7 +143,7 @@ exports.getAccountUrl = function (event) {
     req.end();
 }
 //进入账套
-exports.entryAccount = function (reqCookie, url, event) {
+exports.entryAccount = function (reqCookie, url, event,companyIds,index,resolve,reject) {
     let option = { port: 34 };
     option.headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -129,7 +154,7 @@ exports.entryAccount = function (reqCookie, url, event) {
         console.log("location:", location);
         data.kd_current_account_cookie = util.parseCookie(res.headers['set-cookie']);
         console.log("entry account cookie:", data.kd_current_account_cookie);
-        exports.accountRedirect(location,event);
+        exports.accountRedirect(location,event,companyIds,index,resolve,reject);
         res.on('data', (d) => {
             process.stdout.write(d);
         });
@@ -139,7 +164,7 @@ exports.entryAccount = function (reqCookie, url, event) {
     });
 }
 //账套重定向
-exports.accountRedirect = function (url, event) {
+exports.accountRedirect = function (url, event,companyIds,index,resolve,reject) {
     let option = { port: 34 };
     option.headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -149,7 +174,7 @@ exports.accountRedirect = function (url, event) {
         let cookie = util.parseCookie(res.headers['set-cookie']);
         data.kd_current_account_cookie = data.kd_current_account_cookie + ";" + cookie;
         console.log("current cookie:", data.kd_current_account_cookie);
-        exports.loadVoucher(event);
+        exports.loadVoucher(event,companyIds,index,resolve,reject);
         res.on('data', (d) => {
             process.stdout.write(d);
         });
@@ -158,7 +183,7 @@ exports.accountRedirect = function (url, event) {
     });
 }
 //查询凭证列表
-exports.loadVoucher = function(event){
+exports.loadVoucher = function(event,companyIds,index,resolve,reject){
     let option = { port: 34 };
     option.headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -168,6 +193,8 @@ exports.loadVoucher = function(event){
     https.get(url, option, (res) => {
         res.on('data', (d) => {
             process.stdout.write(d);
+            dialog.showMessageBox(data.current_window,{message:d.toString(),title:"从金碟账无忧导出的数据，导入到岁月会计云还未实现"});
+            data.current_window
         });
     }).on('error',(e) => {
         console.error(e);
