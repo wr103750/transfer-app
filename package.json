@@ -8,7 +8,7 @@
     "start": "electron --inspect=5858 .",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "electron-packager":"electron-packager . --icon=favicon.ico"
+    "electron-packager": "electron-packager . --icon=favicon.ico"
   },
   "author": "wangrui",
   "license": "ISC",
