@@ -20,7 +20,6 @@ exports.login = function (username, password, win, event) {
     };
     let post_req = https.request(post_option, function (res) {
         cookie = res.headers['set-cookie'];
-        console.log("kd_login cookie:",cookie);
         redirect(util.parseCookie(cookie), event);
     });
     post_req.write('');
@@ -58,17 +57,15 @@ exports.nodecustomer = function (event) {
     let post_option = {
         hostname: 'vip4.kdzwy.com',
         port: 443,
-        path: '/guanjia/acctflow/nodecustomer?nodeId=20232&page=1&limit=10&orderProperty=acctCreateDate&orderDirection=desc&condition2=at_Create',
+        path: '/guanjia/acctflow/nodecustomer?nodeId=20232&page=1&limit=100&orderProperty=acctCreateDate&orderDirection=desc&condition2=at_Create',
         method: 'GET'
     };
     post_option.headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
         Cookie: data.kd_login_redirect_cookie
     };
-    console.info("kd_login_redirect_cookie:",data.kd_login_redirect_cookie);
     let post_req = https.request(post_option, function (res) {
         resCookie = res.headers['set-cookie'];
-        console.log("nodecuster cookie:",resCookie);
         let rawData = '';
         res.on('data', function (buffer) {
             rawData = rawData + buffer;
@@ -96,9 +93,6 @@ exports.importOne = function(event,companyIds,index){
     let promise = new Promise((resolve,reject) => {
         try{
             exports.getAccountUrl(event,companyIds,index,resolve,reject);
-            if(index < companyIds.length-1){
-                resolve(index + 1);
-            }
         }catch(e){
             log.error(e);
         }
@@ -115,7 +109,7 @@ exports.getAccountUrl = function (event,companyIds,index,resolve,reject) {
     let option = {
         hostname: 'vip4.kdzwy.com',
         port: 443,
-        path: '/guanjia/customer/accounturl?companyId=6398919',
+        path: '/guanjia/customer/accounturl?companyId=' + companyIds[index],
         method: 'GET'
     }
     option.headers = {
@@ -124,7 +118,6 @@ exports.getAccountUrl = function (event,companyIds,index,resolve,reject) {
     };
     let req = https.request(option, function (res) {
         let resCookie = util.parseCookie(res.headers['set-cookie']);
-        console.log("account url cookie:", resCookie);
         let rawData = '';
         res.on('data', function (buffer) {
             rawData = rawData + buffer;
@@ -132,7 +125,6 @@ exports.getAccountUrl = function (event,companyIds,index,resolve,reject) {
         res.on('end', () => {
             try {
                 const parsedData = JSON.parse(rawData);
-                console.info(parsedData);
                 exports.entryAccount(resCookie, parsedData.data, event,companyIds,index,resolve,reject);
             } catch (e) {
                 console.error(e.message);
@@ -151,9 +143,7 @@ exports.entryAccount = function (reqCookie, url, event,companyIds,index,resolve,
     }
     https.get(url, option, (res) => {
         let location = res.headers['location'];
-        console.log("location:", location);
         data.kd_current_account_cookie = util.parseCookie(res.headers['set-cookie']);
-        console.log("entry account cookie:", data.kd_current_account_cookie);
         exports.accountRedirect(location,event,companyIds,index,resolve,reject);
         res.on('data', (d) => {
             process.stdout.write(d);
@@ -172,8 +162,7 @@ exports.accountRedirect = function (url, event,companyIds,index,resolve,reject) 
     }
     https.get(url, option, (res) => {
         let cookie = util.parseCookie(res.headers['set-cookie']);
-        data.kd_current_account_cookie = data.kd_current_account_cookie + ";" + cookie;
-        console.log("current cookie:", data.kd_current_account_cookie);
+        //data.kd_current_account_cookie = data.kd_current_account_cookie + ";" + cookie;
         exports.loadVoucher(event,companyIds,index,resolve,reject);
         res.on('data', (d) => {
             process.stdout.write(d);
@@ -189,12 +178,19 @@ exports.loadVoucher = function(event,companyIds,index,resolve,reject){
         'Content-Type': 'application/x-www-form-urlencoded',
         Cookie: data.kd_current_account_cookie
     }
-    let url = "https://vip4.kdzwy.com:34/gl/voucher?m=findList&fromPeriod=202108&toPeriod=202108&_search=false&nd=1628771931403&rows=100&page=1&sidx=date&sord=asc";
+    console.log("loadVoucher use cookie:",data.kd_current_account_cookie);
+    let url = "https://vip4.kdzwy.com:34/gl/voucher?m=findList&fromPeriod=200001&toPeriod=202201&_search=false&nd=1628771931403&rows=100&page=1&sidx=date&sord=asc";
     https.get(url, option, (res) => {
+        let rawData = '';
         res.on('data', (d) => {
-            process.stdout.write(d);
-            dialog.showMessageBox(data.current_window,{message:d.toString(),title:"从金碟账无忧导出的数据，导入到岁月会计云还未实现"});
-            data.current_window
+            //process.stdout.write(d);
+            rawData = rawData + d;
+        });
+        res.on('end',()=>{
+            dialog.showMessageBox(data.current_window,{message:rawData.toString(),title:"从金碟账无忧导出的数据，导入到岁月会计云还未实现"});
+            if(index < companyIds.length-1){
+                resolve(index + 1);
+            }
         });
     }).on('error',(e) => {
         console.error(e);
