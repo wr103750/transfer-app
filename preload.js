@@ -12,7 +12,7 @@ contextBridge.exposeInMainWorld('context', {
     changePage:(page) => ipcRenderer.send("change-page",page),
     kdzwyNext:() => ipcRenderer.send("kdzwy_next"),
     initAccountSet:() => ipcRenderer.send("init_account_set"),
-    dataImport: (companyIds) => ipcRenderer.send("data_import",companyIds)
+    dataImport: (companys) => ipcRenderer.send("data_import",companys)
 });
 
 //显示或者隐藏登录错误信息，登录成功显示下一步
@@ -42,7 +42,8 @@ ipcRenderer.on("show_kd_account_set",function(event,data){
     let items = data.data.items;
     let html = "";
     for(let item of items){
-        html = html + `<div class="checkbox"><label><input type="checkbox" name="account_set" value="${item.companyId}" class="form-check-input">${item.companyName}</label></div>`;
+        html = html + `<div class="checkbox"><label><input type="checkbox" name="account_set" value="${item.companyId}" class="form-check-input" 
+        data-account-date="${item.accountDate}" data-company-name="${item.companyName}" data-tax-type="${item.taxType}">${item.companyName}</label></div>`;
     }
     let span = document.getElementById("s_account_set_checkbox");
     span.innerHTML = span.innerHTML + html;

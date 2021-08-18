@@ -1,9 +1,11 @@
 const https = require("https");
+const http = require("http");
 const iconv = require("iconv-lite");
 const querystring = require('querystring');
 const data = require("./data");
-let util = require('./util');
+const util = require('./util');
 const {dialog} = require("electron");
+const config = require("../config.js");
 /**
  * 金碟帐无忧接口调用
  */
@@ -84,32 +86,32 @@ exports.nodecustomer = function (event) {
 }
 
 //循环导入所有账套的数据
-exports.dataImport = function(event,companyIds){
-    exports.importOne(event,companyIds,0);
+exports.dataImport = function(event,companys){
+    importOne(event,companys,0);
 }
 
 //导入单个套账数据
-exports.importOne = function(event,companyIds,index){
+function importOne(event,companys,index){
     let promise = new Promise((resolve,reject) => {
         try{
-            exports.getAccountUrl(event,companyIds,index,resolve,reject);
+            getAccountUrl(event,companys,index,resolve,reject);
         }catch(e){
             log.error(e);
         }
     });
     promise.then((data) =>{
-        exports.importOne(event,companyIds,data);
+        importOne(event,companys,data);
     },(error)=>{
         log.error(error);
     })
 }
 
 //获取账套url
-exports.getAccountUrl = function (event,companyIds,index,resolve,reject) {
+function getAccountUrl(event,companys,index,resolve,reject) {
     let option = {
         hostname: 'vip4.kdzwy.com',
         port: 443,
-        path: '/guanjia/customer/accounturl?companyId=' + companyIds[index],
+        path: '/guanjia/customer/accounturl?companyId=' + companys[index].companyId,
         method: 'GET'
     }
     option.headers = {
@@ -125,7 +127,7 @@ exports.getAccountUrl = function (event,companyIds,index,resolve,reject) {
         res.on('end', () => {
             try {
                 const parsedData = JSON.parse(rawData);
-                exports.entryAccount(resCookie, parsedData.data, event,companyIds,index,resolve,reject);
+                entryAccount(resCookie, parsedData.data, event,companys,index,resolve,reject);
             } catch (e) {
                 console.error(e.message);
             }
@@ -135,7 +137,7 @@ exports.getAccountUrl = function (event,companyIds,index,resolve,reject) {
     req.end();
 }
 //进入账套
-exports.entryAccount = function (reqCookie, url, event,companyIds,index,resolve,reject) {
+function entryAccount(reqCookie, url, event,companys,index,resolve,reject) {
     let option = { port: 34 };
     option.headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -144,7 +146,7 @@ exports.entryAccount = function (reqCookie, url, event,companyIds,index,resolve,
     https.get(url, option, (res) => {
         let location = res.headers['location'];
         data.kd_current_account_cookie = util.parseCookie(res.headers['set-cookie']);
-        exports.accountRedirect(location,event,companyIds,index,resolve,reject);
+        accountRedirect(location,event,companys,index,resolve,reject);
         res.on('data', (d) => {
             process.stdout.write(d);
         });
@@ -154,7 +156,7 @@ exports.entryAccount = function (reqCookie, url, event,companyIds,index,resolve,
     });
 }
 //账套重定向
-exports.accountRedirect = function (url, event,companyIds,index,resolve,reject) {
+function accountRedirect(url, event,companys,index,resolve,reject) {
     let option = { port: 34 };
     option.headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -163,7 +165,7 @@ exports.accountRedirect = function (url, event,companyIds,index,resolve,reject) 
     https.get(url, option, (res) => {
         let cookie = util.parseCookie(res.headers['set-cookie']);
         //data.kd_current_account_cookie = data.kd_current_account_cookie + ";" + cookie;
-        exports.loadVoucher(event,companyIds,index,resolve,reject);
+        loadAccountInfo(event,companys,index,resolve,reject);
         res.on('data', (d) => {
             process.stdout.write(d);
         });
@@ -171,8 +173,58 @@ exports.accountRedirect = function (url, event,companyIds,index,resolve,reject) 
         console.error(e);
     });
 }
+//获取账套信息
+function loadAccountInfo(event,companys,index,resolve,reject){
+    let option = { port: 34 };
+    option.headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Cookie: data.kd_current_account_cookie
+    }
+    https.get("https://vip4.kdzwy.com:34/default.jsp", option, (res) => {
+        let rawData = '';
+        res.on('data', (d) => {
+            rawData = rawData + d;
+        });
+        res.on('end',()=>{
+            let arr = rawData.match(/PERIOD: "\d{6}" , \/\/启用期间/g);
+            let period = arr[0].substr(9,6);
+            dialog.showMessageBox(data.current_window,{message:period,title:"账套信息"});
+            saveAccountSet(event,companys,index,period,resolve,reject);
+        });
+    }).on('error',(e) => {
+        console.error(e);
+    });
+}
+//导入账套
+function saveAccountSet(event,companys,index,period,resolve,reject){
+    let option = {port:8358};
+    option.headers = {
+        'Content-Type': 'application/json'
+    };
+    let company = companys[index];
+    let bodyObj = {
+        companyName:company.companyName,
+        accountDate:company.accountDate,
+        period:period,
+        taxType:company.taxType
+    };
+    console.info("bodyObj",bodyObj);
+    return;
+    let http_req = http.request(config.conf.whty_url_account_set,option,(res) => {
+        let rawData = '';
+        res.on('data',(d) => {
+
+        });
+        res.on('end',()=>{
+            //调用岁月云导入账套
+            loadVoucher(event,companys,index,resolve,reject);
+        });
+    });
+    http_req.write();
+    http_req.end();
+}
 //查询凭证列表
-exports.loadVoucher = function(event,companyIds,index,resolve,reject){
+function loadVoucher(event,companys,index,resolve,reject){
     let option = { port: 34 };
     option.headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -187,8 +239,7 @@ exports.loadVoucher = function(event,companyIds,index,resolve,reject){
             rawData = rawData + d;
         });
         res.on('end',()=>{
-            dialog.showMessageBox(data.current_window,{message:rawData.toString(),title:"从金碟账无忧导出的数据，导入到岁月会计云还未实现"});
-            if(index < companyIds.length-1){
+            if(index < companys.length-1){
                 resolve(index + 1);
             }
         });

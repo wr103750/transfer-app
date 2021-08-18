@@ -7,14 +7,21 @@ $(function(){
     });
     //导入
     $("#b_data_import").click(function(){
-        let companyIds = [];
+        let companys = [];
         $.each($("input[name=account_set]:checked"),function(index,val){
-            companyIds.push($(val).val());
+            let info = {
+                companyId:$(val).val(),
+                companyName:$(val).attr("data-company-name"),
+                accountDate:$(val).attr("data-account-date"),
+                taxType:$(val).attr("data-tax-type")
+            }
+            companys.push(info);
         });
-        if(companyIds.length == 0){
+        if(companys.length == 0){
             alert("请先选择账套");
             return;
         }
-        window.context.dataImport(companyIds);
+        console.info(companys);
+        window.context.dataImport(companys);
     });
 });

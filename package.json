@@ -6,8 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron --inspect=5858 .",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
     "electron-packager": "electron-packager . --icon=favicon.ico"
   },
   "author": "wangrui",
@@ -17,33 +15,12 @@
   },
   "dependencies": {
     "bootstrap": "^5.1.0",
-    "electron-squirrel-startup": "^1.0.0",
     "iconv-lite": "^0.6.3"
   },
   "config": {
     "forge": {
       "packagerConfig": {},
       "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "my_app"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
-        }
       ]
     }
   }

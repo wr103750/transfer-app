@@ -64,9 +64,9 @@ function createWindow () {
     http_kdzwy.nodecustomer(event);
   });
   //金碟账无忧数据导入
-  ipcMain.on("data_import",function(event,companyIds ){
-    console.info(companyIds);
-    http_kdzwy.dataImport(event,companyIds);
+  ipcMain.on("data_import",function(event,companys ){
+    console.info(companys);
+    http_kdzwy.dataImport(event,companys);
   });
 }
 
