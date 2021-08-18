@@ -197,30 +197,37 @@ function loadAccountInfo(event,companys,index,resolve,reject){
 }
 //导入账套
 function saveAccountSet(event,companys,index,period,resolve,reject){
-    let option = {port:8358};
-    option.headers = {
-        'Content-Type': 'application/json'
-    };
+    let option = {
+        port:8358,
+        hostname: 'localhost',
+        path: '/kdTransfer/accountSet',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }};
     let company = companys[index];
-    let bodyObj = {
+    let body = {
         companyName:company.companyName,
         accountDate:company.accountDate,
         period:period,
-        taxType:company.taxType
+        taxType:company.taxType,
+        accountingStandard:"1",
+        createUser:"10001"
     };
-    console.info("bodyObj",bodyObj);
-    return;
-    let http_req = http.request(config.conf.whty_url_account_set,option,(res) => {
+    let http_req = http.request(option,(res) => {
         let rawData = '';
         res.on('data',(d) => {
-
+            rawData = rawData + d;
         });
         res.on('end',()=>{
+            console.info("account set result:",rawData.toString());
             //调用岁月云导入账套
-            loadVoucher(event,companys,index,resolve,reject);
+            //loadVoucher(event,companys,index,resolve,reject);
         });
+    }).on('error',(e) => {
+        console.error(e);
     });
-    http_req.write();
+    http_req.write(JSON.stringify(body));
     http_req.end();
 }
 //查询凭证列表
