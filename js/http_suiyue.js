@@ -1,16 +1,16 @@
 const http = require("http");
-let crypto = require('crypto');
-let querystring = require('querystring');
+const crypto = require('crypto');
 const data = require("./data");
+const config = require("../config.js");
 exports.login = function (username,password,win,event){
     let post_option = {
-        hostname: '116.63.222.203',
-        port: 18001,
-        path: '/api/auth/jwt/token',
+        hostname: config.conf.whty_suiyue_hostname,
+        port: config.conf.whty_suiyue_port,
+        path: config.conf.whty_suiyue_login_path,
         method: 'POST'
     };
     let md5pwd = crypto.createHash("md5").update(password).digest("hex")
-    let post_data = querystring.stringify({
+    let urlParams = new URLSearchParams({
         username:username,
         password:md5pwd
     });
@@ -30,10 +30,10 @@ exports.login = function (username,password,win,event){
                 win.loadFile("./html/index.html");
             }else {
                 event.reply("login_msg","error");
-                win.loadFile("./html/index.html")
+                //win.loadFile("./html/index.html")
             }
         });
     });
-    post_req.write(post_data);
+    post_req.write(urlParams.toString());
     post_req.end();
 }
