@@ -24,7 +24,6 @@ exports.login = function (username,password,win,event){
         });
         res.on('end',function(){
             data.loginInfo = JSON.parse(rawData);
-            console.log("suiyue login info:",data.loginInfo);
             if(data.loginInfo.success){
                 event.reply("login_msg","success");
                 win.loadFile("./html/index.html");

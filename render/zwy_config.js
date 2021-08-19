@@ -21,7 +21,9 @@ $(function(){
             alert("请先选择账套");
             return;
         }
-        console.info(companys);
-        window.context.dataImport(companys);
+        let accountingStandard = $("input[name=accounting_standard]:checked").val();
+        console.info(accountingStandard);
+        let taxType = $("input[name=tax_type]:checked").val();
+        window.context.dataImport(companys,accountingStandard,taxType);
     });
 });

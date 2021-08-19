@@ -12,7 +12,7 @@ contextBridge.exposeInMainWorld('context', {
     changePage:(page) => ipcRenderer.send("change-page",page),
     kdzwyNext:() => ipcRenderer.send("kdzwy_next"),
     initAccountSet:() => ipcRenderer.send("init_account_set"),
-    dataImport: (companys) => ipcRenderer.send("data_import",companys)
+    dataImport: (companys,accountingStandard,taxType) => ipcRenderer.send("data_import",companys,accountingStandard,taxType)
 });
 
 //显示或者隐藏登录错误信息，登录成功显示下一步
