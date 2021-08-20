@@ -90,7 +90,7 @@ exports.dataImport = function (event, companys) {
     //importOne(event,companys,0);
     let promise;
     for (let company of companys) {
-        promise = importOne(company).then(getAccountUrl).then(entryAccount).then(accountRedirect).then(loadAccountInfo).then(loadAllAccInit);
+        promise = importOne(company).then(getAccountUrl).then(entryAccount).then(accountRedirect).then(loadAccountInfo).then(saveAccountSet).then(loadAllAccInit);
     }
 }
 
@@ -100,7 +100,7 @@ function importOne(company) {
         try {
             resolve(company);
         } catch (e) {
-            log.error(e);
+            console.error(e);
         }
     });
     return promise;
@@ -245,6 +245,8 @@ function saveAccountSet(arr) {
             });
             res.on('end', () => {
                 console.info("account set result:", rawData.toString());
+                let result = JSON.parse(rawData);
+                data.asId = result.data;
                 resolve();
                 //调用岁月云导入账套
                 //loadVoucher(event,companys,index,resolve,reject);
@@ -262,7 +264,7 @@ function loadAllAccInit(){
     let promise;
     for(let i=1;i<=5;i++){
         if(promise == null){
-            promise = loadAccInit(i);
+            promise = loadAccInit(i).then(accountInitial);
         }else{
             promise = promise.then(() => {
                 return loadAccInit(i).then(accountInitial);
@@ -306,7 +308,8 @@ function accountInitial(items) {
         };
         let body = {
             items:items,
-            asId:data.asId
+            asId:data.asId,
+            createUser:data.loginInfo.data.id
         };
         let http_req = http.request(option, (res) => {
             let rawData = '';
@@ -314,7 +317,7 @@ function accountInitial(items) {
                 rawData = rawData + d;
             });
             res.on('end', () => {
-                console.info("account set result:", rawData.toString());
+                console.info("accountInitial result:", rawData.toString());
                 resolve();
             });
         }).on('error', (e) => {

@@ -9,4 +9,4 @@ exports.current_window = null;
 
 exports.accountingStandard = "1";
 exports.taxType = "1";
-exports.asId;
+exports.asId = 0;
