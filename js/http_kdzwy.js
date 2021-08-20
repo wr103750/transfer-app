@@ -90,7 +90,15 @@ exports.dataImport = function (event, companys) {
     //importOne(event,companys,0);
     let promise;
     for (let company of companys) {
-        promise = importOne(company).then(getAccountUrl).then(entryAccount).then(accountRedirect).then(loadAccountInfo).then(saveAccountSet).then(loadAllAccInit);
+        promise = importOne(company)
+        .then(getAccountUrl)
+        .then(entryAccount)
+        .then(accountRedirect)
+        .then(loadAccountInfo)
+        .then(saveAccountSet)
+        .then(loadAllAccInit)
+        .then(loadVoucher)
+        .then(accoutVoucher);
     }
 }
 
@@ -329,25 +337,62 @@ function accountInitial(items) {
     return promise;
 }
 //查询凭证列表
-function loadVoucher(event, companys, index, resolve, reject) {
-    let option = { port: 34 };
-    option.headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Cookie: data.kd_current_account_cookie
-    }
-    let url = "https://vip4.kdzwy.com:34/gl/voucher?m=findList&fromPeriod=200001&toPeriod=202201&_search=false&nd=1628771931403&rows=100&page=1&sidx=date&sord=asc";
-    https.get(url, option, (res) => {
-        let rawData = '';
-        res.on('data', (d) => {
-            //process.stdout.write(d);
-            rawData = rawData + d;
+function loadVoucher() {
+    let promise = new Promise((resolve,reject) => {
+        let option = { port: 34 };
+        option.headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Cookie: data.kd_current_account_cookie
+        }
+        let url = "https://vip4.kdzwy.com:34/gl/voucher?m=findList&fromPeriod=200001&toPeriod=202201&_search=false&nd=1628771931403&rows=100&page=1&sidx=date&sord=asc";
+        https.get(url, option, (res) => {
+            let rawData = '';
+            res.on('data', (d) => {
+                //process.stdout.write(d);
+                rawData = rawData + d;
+            });
+            res.on('end', () => {
+                let objData = JSON.parse(rawData);
+                resolve(objData.rows);
+            });
+        }).on('error', (e) => {
+            console.error(e);
         });
-        res.on('end', () => {
-            if (index < companys.length - 1) {
-                resolve(index + 1);
-            }
-        });
-    }).on('error', (e) => {
-        console.error(e);
     });
+    return promise;
+}
+
+//导入凭证
+function accoutVoucher(rows) {
+    let promise = new Promise((resolve, reject) => {
+        let option = {
+            port: 8358,
+            hostname: 'localhost',
+            path: '/kdTransfer/accoutVoucher',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+        let body = {
+            items:items,
+            asId:data.asId,
+            createUser:data.loginInfo.data.id
+        };
+        let http_req = http.request(option, (res) => {
+            let rawData = '';
+            res.on('data', (d) => {
+                rawData = rawData + d;
+            });
+            res.on('end', () => {
+                console.info("accoutVoucher result:", rawData.toString());
+                resolve();
+            });
+        }).on('error', (e) => {
+            console.error(e);
+        });
+        http_req.write(JSON.stringify(body));
+        http_req.end();
+    });
+    return promise;
 }
