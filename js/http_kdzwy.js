@@ -279,6 +279,7 @@ function loadAllAccInit(){
             });
         }
     }
+    return promise;
 }
 //查询期初余额
 function loadAccInit(num){
@@ -380,6 +381,7 @@ function accoutVoucher(rows) {
             rows:rows,
             createUserName:data.loginInfo.data.name
         };
+        console.info("start accoutVoucer");
         let http_req = http.request(option, (res) => {
             let rawData = '';
             res.on('data', (d) => {
