@@ -368,16 +368,17 @@ function accoutVoucher(rows) {
         let option = {
             port: 8358,
             hostname: 'localhost',
-            path: '/kdTransfer/accoutVoucher',
+            path: '/kdTransfer/accountVoucher',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             }
         };
         let body = {
-            items:items,
             asId:data.asId,
-            createUser:data.loginInfo.data.id
+            createUser:data.loginInfo.data.id,
+            rows:rows,
+            createUserName:data.loginInfo.data.name
         };
         let http_req = http.request(option, (res) => {
             let rawData = '';
