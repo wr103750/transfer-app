@@ -6,7 +6,8 @@ const http_ningmengyun = require('./js/http_ningmengyun.js');
 const http_kdzwy = require('./js/http_kdzwy.js');
 const http_suiyue = require("./js/http_suiyue");
 const data = require("./js/data.js");
-const util = require("./js/util")
+const util = require("./js/util");
+const Store = require("electron-store");
 // 在文件头部引入 Node.js 中的 path 模块
 const path = require('path');
 
@@ -43,9 +44,15 @@ function createWindow () {
   ipcMain.on("change-page",function (event,page){
     win.loadFile(page);
   });
+  ipcMain.on("init-remember",function(event){
+    let store = new Store();
+    if(store.get("remember")){
+      event.reply("init-response",store.get("username"),store.get("password"));
+    }
+  });
   //登录
-  ipcMain.on("login",function(event,username,password){
-    http_suiyue.login(username,password,win,event);
+  ipcMain.on("login",function(event,username,password,remember){
+    http_suiyue.login(username,password,win,event,remember);
   });
   //第三方账务平台账号测试
   ipcMain.on("accountTest",function (event,username,password,platform){

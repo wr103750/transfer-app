@@ -16,7 +16,6 @@ function calPercent(){
     if(percent > 100){
         percent = 100;
     }
-    console.info("percent:",percent);
     return percent;
 }
 module.exports = {parseCookie,calPercent}

@@ -7,13 +7,21 @@ contextBridge.exposeInMainWorld('context', {
     desktop: true,
     doThing: () => ipcRenderer.send('do-a-thing'),
     accountTest:(username,password,platform) => ipcRenderer.send("accountTest",username,password,platform),
-    login:(username,password) => ipcRenderer.send("login",username,password),
+    initRemember:() => ipcRenderer.send("init-remember"),
+    login:(username,password,remember) => ipcRenderer.send("login",username,password,remember),
     dialog:(message) => ipcRenderer.send("dialog-message",message),
     changePage:(page) => ipcRenderer.send("change-page",page),
     kdzwyNext:() => ipcRenderer.send("kdzwy_next"),
     initAccountSet:() => ipcRenderer.send("init_account_set"),
     dataImport: (companys,accountingStandard,taxType) => ipcRenderer.send("data_import",companys,accountingStandard,taxType),
     continueImport:() => ipcRenderer.send("continue_import")
+});
+
+//填充保存的账号密码
+ipcRenderer.on("init-response",function(event,username,password){
+    document.querySelector("#i_username").value=username;
+    document.querySelector("#i_password").value=password;
+    document.querySelector("#i_remember").checked="checked";
 });
 
 //显示或者隐藏登录错误信息，登录成功显示下一步

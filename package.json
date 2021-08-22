@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "bootstrap": "^5.1.0",
-    "iconv-lite": "^0.6.3",
-    "jquery": "^3.6.0"
+    "electron-store": "^8.0.0",
+    "iconv-lite": "^0.6.3"
   },
   "config": {
     "forge": {
