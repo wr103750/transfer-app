@@ -65,9 +65,16 @@ function createWindow () {
   });
   //金碟账无忧数据导入
   ipcMain.on("data_import",function(event,companys,accountingStandard,taxType){
+    win.loadFile("html/zwy_result.html");
     data.accountingStandard = accountingStandard;
     data.taxType = taxType;
+    data.current_step = 0;
+    data.account_num = companys.length;
     http_kdzwy.dataImport(event,companys);
+  });
+  //继续导账
+  ipcMain.on("continue_import",function(event){
+    win.loadFile("./html/index.html");
   });
 }
 
@@ -83,5 +90,5 @@ app.on('window-all-closed', function () {
 })
 
 ipcMain.on("dialog-message",function (event,arg){
-  dialog.showMessageBox({title:"标题",message:arg});
+  dialog.showMessageBox(data.current_window,{title:"标题",message:arg});
 });

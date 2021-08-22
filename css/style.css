@@ -13,3 +13,7 @@
     height: 400px;
     overflow: auto;
 }
+/**zwy_result.html**/
+#success-info{
+    display: none;
+}

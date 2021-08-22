@@ -98,7 +98,10 @@ exports.dataImport = function (event, companys) {
         .then(saveAccountSet)
         .then(loadAllAccInit)
         .then(loadVoucher)
-        .then(accoutVoucher);
+        .then(accoutVoucher)
+        .then(()=>{
+            data.current_window.webContents.send("update_percent",100);
+        });
     }
 }
 
@@ -136,6 +139,7 @@ function getAccountUrl(company) {
             res.on('end', () => {
                 try {
                     const parsedData = JSON.parse(rawData);
+                    data.current_window.webContents.send("update_percent",util.calPercent());
                     resolve([resCookie, parsedData.data, company]);
                     //entryAccount(resCookie, parsedData.data, event,companys,index,resolve,reject);
                 } catch (e) {
@@ -163,6 +167,7 @@ function entryAccount(arr) {
             let location = res.headers['location'];
             data.kd_current_account_cookie = util.parseCookie(res.headers['set-cookie']);
             resolve([location, company]);
+            data.current_window.webContents.send("update_percent",util.calPercent());
             //accountRedirect(location,event,companys,index,resolve,reject);
             res.on('data', (d) => {
                 process.stdout.write(d);
@@ -188,6 +193,7 @@ function accountRedirect(arr) {
             let cookie = util.parseCookie(res.headers['set-cookie']);
             //loadAccountInfo(event,companys,index,resolve,reject);
             resolve(company);
+            data.current_window.webContents.send("update_percent",util.calPercent());
             res.on('data', (d) => {
                 process.stdout.write(d);
             });
@@ -213,8 +219,8 @@ function loadAccountInfo(company) {
             res.on('end', () => {
                 let arr = rawData.match(/PERIOD: "\d{6}" , \/\/启用期间/g);
                 let period = arr[0].substr(9, 6);
-                dialog.showMessageBox(data.current_window, { message: period, title: "账套信息" });
                 resolve([company, period]);
+                data.current_window.webContents.send("update_percent",util.calPercent());
                 //saveAccountSet(event,companys,index,period,resolve,reject);
             });
         }).on('error', (e) => {
@@ -256,6 +262,7 @@ function saveAccountSet(arr) {
                 let result = JSON.parse(rawData);
                 data.asId = result.data;
                 resolve();
+                data.current_window.webContents.send("update_percent",util.calPercent());
                 //调用岁月云导入账套
                 //loadVoucher(event,companys,index,resolve,reject);
             });
@@ -298,6 +305,7 @@ function loadAccInit(num){
             res.on('end',() => {
                 let objData = JSON.parse(rawData);
                 resolve(objData.data.items);
+                data.current_window.webContents.send("update_percent",util.calPercent());
             });
         });
     });
@@ -328,6 +336,7 @@ function accountInitial(items) {
             res.on('end', () => {
                 console.info("accountInitial result:", rawData.toString());
                 resolve();
+                data.current_window.webContents.send("update_percent",util.calPercent());
             });
         }).on('error', (e) => {
             console.error(e);
@@ -355,6 +364,7 @@ function loadVoucher() {
             res.on('end', () => {
                 let objData = JSON.parse(rawData);
                 resolve(objData.rows);
+                data.current_window.webContents.send("update_percent",util.calPercent());
             });
         }).on('error', (e) => {
             console.error(e);
@@ -390,6 +400,7 @@ function accoutVoucher(rows) {
             res.on('end', () => {
                 console.info("accoutVoucher result:", rawData.toString());
                 resolve();
+                data.current_window.webContents.send("update_percent",util.calPercent());
             });
         }).on('error', (e) => {
             console.error(e);

@@ -12,7 +12,8 @@ contextBridge.exposeInMainWorld('context', {
     changePage:(page) => ipcRenderer.send("change-page",page),
     kdzwyNext:() => ipcRenderer.send("kdzwy_next"),
     initAccountSet:() => ipcRenderer.send("init_account_set"),
-    dataImport: (companys,accountingStandard,taxType) => ipcRenderer.send("data_import",companys,accountingStandard,taxType)
+    dataImport: (companys,accountingStandard,taxType) => ipcRenderer.send("data_import",companys,accountingStandard,taxType),
+    continueImport:() => ipcRenderer.send("continue_import")
 });
 
 //显示或者隐藏登录错误信息，登录成功显示下一步
@@ -47,4 +48,12 @@ ipcRenderer.on("show_kd_account_set",function(event,data){
     }
     let span = document.getElementById("s_account_set_checkbox");
     span.innerHTML = span.innerHTML + html;
+});
+
+ipcRenderer.on("update_percent",function(event,percent){
+    document.querySelector(".progress-bar-success").style.width=percent + "%";
+    document.querySelector("#percent-text").innerHTML=(percent + "%完成");
+    if(percent === 100){
+        document.querySelector("#success-info").style.display = "block";
+    }
 });
