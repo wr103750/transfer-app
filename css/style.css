@@ -17,3 +17,10 @@
 #success-info{
     display: none;
 }
+.head-title{
+    background-color:#eeeeee;
+}
+.head-user{
+    padding: auto;
+    height:40px;
+}
