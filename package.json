@@ -15,13 +15,13 @@
   },
   "dependencies": {
     "bootstrap": "^5.1.0",
+    "electron-packager": "^15.3.0",
     "iconv-lite": "^0.6.3"
   },
   "config": {
     "forge": {
       "packagerConfig": {},
-      "makers": [
-      ]
+      "makers": []
     }
   }
 }
