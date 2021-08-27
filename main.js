@@ -26,10 +26,25 @@ function createWindow() {
   win.loadFile('./html/login.html');
   let content = win.webContents;
   //自动升级
-  const server = "transfer-app-sage.vercel.app";
-  const url = `${server}/update/${process.platform}/1.0.0`
+  const server = "https://transfer-app-sage.vercel.app";
+  const url = `${server}/update/${process.platform}/${app.getVersion()}`
+  console.log("url:",url);
 
-  autoUpdater.setFeedURL({ url })
+  autoUpdater.setFeedURL({ url });
+  autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+    const dialogOpts = {
+      type: 'info',
+      buttons: ['Restart', 'Later'],
+      title: 'Application Update',
+      message: process.platform === 'win32' ? releaseNotes : releaseName,
+      detail: 'A new version has been downloaded. Restart the application to apply the updates.'
+    }
+  
+    dialog.showMessageBox(dialogOpts).then((returnValue) => {
+      if (returnValue.response === 0) autoUpdater.quitAndInstall()
+    })
+  })
+  autoUpdater.checkForUpdates();
 
   //菜单
   const menu = new Menu()

@@ -247,7 +247,7 @@ function saveAccountSet(arr) {
             period: period,
             taxType: data.taxType,
             accountingStandard: data.accountingStandard,
-            createUser: "10001"
+            createUser: data.loginInfo.data.id
         };
         let http_req = http.request(option, (res) => {
             let rawData = '';
