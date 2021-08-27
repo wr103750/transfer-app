@@ -1,5 +1,5 @@
-const { app, BrowserWindow } = require('electron');
-const { Menu, MenuItem,dialog} = require('electron');
+const { app, BrowserWindow, autoUpdater } = require('electron');
+const { Menu, MenuItem, dialog } = require('electron');
 const ipcMain = require('electron').ipcMain;
 const { Notification } = require('electron');
 const http_ningmengyun = require('./js/http_ningmengyun.js');
@@ -12,11 +12,11 @@ const Store = require("electron-store");
 const path = require('path');
 
 // 修改现有的 createWindow() 函数
-function createWindow () {
+function createWindow() {
   const win = new BrowserWindow({
     width: 1000,
     height: 700,
-    frame:true,
+    frame: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
       //nodeIntegration:true
@@ -25,13 +25,18 @@ function createWindow () {
   data.current_window = win;
   win.loadFile('./html/login.html');
   let content = win.webContents;
+  //自动升级
+  const server = "transfer-app-sage.vercel.app";
+  const url = `${server}/update/${process.platform}/1.0.0`
+
+  autoUpdater.setFeedURL({ url })
 
   //菜单
   const menu = new Menu()
   menu.append(new MenuItem({
     label: '菜单',
     submenu: [{
-      label:"调试",
+      label: "调试",
       accelerator: process.platform === 'darwin' ? 'Alt+Cmd+I' : 'F12',
       click: () => {
         content.openDevTools();
@@ -41,46 +46,46 @@ function createWindow () {
   Menu.setApplicationMenu(menu);
 
   //页面切换
-  ipcMain.on("change-page",function (event,page){
+  ipcMain.on("change-page", function (event, page) {
     win.loadFile(page);
   });
-  ipcMain.on("init-remember",function(event){
+  ipcMain.on("init-remember", function (event) {
     let store = new Store();
-    if(store.get("remember")){
-      event.reply("init-response",store.get("username"),store.get("password"));
+    if (store.get("remember")) {
+      event.reply("init-response", store.get("username"), store.get("password"));
     }
   });
   //登录
-  ipcMain.on("login",function(event,username,password,remember){
-    http_suiyue.login(username,password,win,event,remember);
+  ipcMain.on("login", function (event, username, password, remember) {
+    http_suiyue.login(username, password, win, event, remember);
   });
   //第三方账务平台账号测试
-  ipcMain.on("accountTest",function (event,username,password,platform){
-    if(platform === 'nmy'){
-      http_ningmengyun.login(username,password);
-    }else if(platform === 'kd'){
-      http_kdzwy.login(username,password,win,event);
+  ipcMain.on("accountTest", function (event, username, password, platform) {
+    if (platform === 'nmy') {
+      http_ningmengyun.login(username, password);
+    } else if (platform === 'kd') {
+      http_kdzwy.login(username, password, win, event);
     }
   });
   //金碟账无忧测试成功后下一步
-  ipcMain.on("kdzwy_next",function(event){
+  ipcMain.on("kdzwy_next", function (event) {
     win.loadFile("html/zwy_config.html");
   });
   //金碟账无忧页面加载完成之后初始化账套数据
-  ipcMain.on("init_account_set",function(event){
+  ipcMain.on("init_account_set", function (event) {
     http_kdzwy.nodecustomer(event);
   });
   //金碟账无忧数据导入
-  ipcMain.on("data_import",function(event,companys,accountingStandard,taxType){
+  ipcMain.on("data_import", function (event, companys, accountingStandard, taxType) {
     win.loadFile("html/zwy_result.html");
     data.accountingStandard = accountingStandard;
     data.taxType = taxType;
     data.current_step = 0;
     data.account_num = companys.length;
-    http_kdzwy.dataImport(event,companys);
+    http_kdzwy.dataImport(event, companys);
   });
   //继续导账
-  ipcMain.on("continue_import",function(event){
+  ipcMain.on("continue_import", function (event) {
     win.loadFile("./html/index.html");
   });
 }
@@ -96,6 +101,6 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-ipcMain.on("dialog-message",function (event,arg){
-  dialog.showMessageBox(data.current_window,{title:"标题",message:arg});
+ipcMain.on("dialog-message", function (event, arg) {
+  dialog.showMessageBox(data.current_window, { title: "标题", message: arg });
 });
