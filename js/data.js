@@ -10,3 +10,8 @@ exports.current_window = null;
 exports.accountingStandard = "1";
 exports.taxType = "1";
 exports.asId = 0;
+
+//导入进度数据
+exports.account_num = 0;//账套数量
+exports.current_step = 0;//当前步数
+exports.import_stage = 9;//导入过程一共分为多少阶段

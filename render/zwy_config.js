@@ -18,7 +18,7 @@ $(function(){
             companys.push(info);
         });
         if(companys.length == 0){
-            alert("请先选择账套");
+            window.context.dialog("请先选择账套");
             return;
         }
         let accountingStandard = $("input[name=accounting_standard]:checked").val();

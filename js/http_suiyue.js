@@ -2,7 +2,8 @@ const http = require("http");
 const crypto = require('crypto');
 const data = require("./data");
 const config = require("../config.js");
-exports.login = function (username,password,win,event){
+const Store = require("electron-store")
+exports.login = function (username,password,win,event,remember){
     let post_option = {
         hostname: config.conf.whty_suiyue_hostname,
         port: config.conf.whty_suiyue_port,
@@ -27,6 +28,17 @@ exports.login = function (username,password,win,event){
             if(data.loginInfo.success){
                 event.reply("login_msg","success");
                 win.loadFile("./html/index.html");
+                let store = new Store();
+                console.info(remember,username,password);
+                if(remember){
+                    store.set("remember",true);
+                    store.set("username",username);
+                    store.set("password",password);
+                }else{
+                    store.delete("remember");
+                    store.delete("username");
+                    store.delete("password");
+                }
             }else {
                 event.reply("login_msg","error");
                 //win.loadFile("./html/index.html")

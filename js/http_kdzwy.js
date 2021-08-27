@@ -22,7 +22,15 @@ exports.login = function (username, password, win, event) {
     };
     let post_req = https.request(post_option, function (res) {
         cookie = res.headers['set-cookie'];
-        redirect(util.parseCookie(cookie), event);
+        let location = res.headers['location'];
+        let url = new URL(location);
+        if(url.searchParams.get("errorMsg")){
+            event.reply("connect_msg", "error");
+        }else{
+            //登录成功显示下一步按钮
+            redirect(util.parseCookie(cookie),location, event);
+            event.reply("connect_msg", "success");
+        }
     });
     post_req.write('');
     post_req.end();
@@ -30,28 +38,17 @@ exports.login = function (username, password, win, event) {
 /**
  * 金碟账无忧登录重定向
  */
-function redirect(reqCookie, event) {
+function redirect(reqCookie,location, event) {
     let post_option = {
-        hostname: 'vip4.kdzwy.com',
-        port: 443,
-        path: '/guanjia/user/login/redirect?username=13040847220&userId=1059355&redirectUri=https://gj.kdzwy.com&from=19980646',
-        method: 'GET'
+        port: 443
     };
     post_option.headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
         Cookie: reqCookie
     };
-    let post_req = https.request(post_option, function (res) {
+    https.get(location,post_option,function(res){
         data.kd_login_redirect_cookie = util.parseCookie(res.headers['set-cookie']);//保存登录重定向后的cookie信息
-        //重定向之后显示下一步按钮
-        if (data.kd_login_redirect_cookie) {
-            event.reply("connect_msg", "success");
-        } else {
-            event.reply("connect_msg", "error");
-        }
     });
-    post_req.write('');
-    post_req.end();
 }
 //账套列表
 exports.nodecustomer = function (event) {
@@ -98,7 +95,10 @@ exports.dataImport = function (event, companys) {
         .then(saveAccountSet)
         .then(loadAllAccInit)
         .then(loadVoucher)
-        .then(accoutVoucher);
+        .then(accoutVoucher)
+        .then(()=>{
+            data.current_window.webContents.send("update_percent",100);
+        });
     }
 }
 
@@ -136,6 +136,7 @@ function getAccountUrl(company) {
             res.on('end', () => {
                 try {
                     const parsedData = JSON.parse(rawData);
+                    data.current_window.webContents.send("update_percent",util.calPercent());
                     resolve([resCookie, parsedData.data, company]);
                     //entryAccount(resCookie, parsedData.data, event,companys,index,resolve,reject);
                 } catch (e) {
@@ -163,6 +164,7 @@ function entryAccount(arr) {
             let location = res.headers['location'];
             data.kd_current_account_cookie = util.parseCookie(res.headers['set-cookie']);
             resolve([location, company]);
+            data.current_window.webContents.send("update_percent",util.calPercent());
             //accountRedirect(location,event,companys,index,resolve,reject);
             res.on('data', (d) => {
                 process.stdout.write(d);
@@ -188,6 +190,7 @@ function accountRedirect(arr) {
             let cookie = util.parseCookie(res.headers['set-cookie']);
             //loadAccountInfo(event,companys,index,resolve,reject);
             resolve(company);
+            data.current_window.webContents.send("update_percent",util.calPercent());
             res.on('data', (d) => {
                 process.stdout.write(d);
             });
@@ -213,8 +216,8 @@ function loadAccountInfo(company) {
             res.on('end', () => {
                 let arr = rawData.match(/PERIOD: "\d{6}" , \/\/启用期间/g);
                 let period = arr[0].substr(9, 6);
-                dialog.showMessageBox(data.current_window, { message: period, title: "账套信息" });
                 resolve([company, period]);
+                data.current_window.webContents.send("update_percent",util.calPercent());
                 //saveAccountSet(event,companys,index,period,resolve,reject);
             });
         }).on('error', (e) => {
@@ -252,10 +255,11 @@ function saveAccountSet(arr) {
                 rawData = rawData + d;
             });
             res.on('end', () => {
-                console.info("account set result:", rawData.toString());
                 let result = JSON.parse(rawData);
                 data.asId = result.data;
+                console.log("saveAccountSet:",rawData.toString());
                 resolve();
+                data.current_window.webContents.send("update_percent",util.calPercent());
                 //调用岁月云导入账套
                 //loadVoucher(event,companys,index,resolve,reject);
             });
@@ -279,6 +283,7 @@ function loadAllAccInit(){
             });
         }
     }
+    return promise;
 }
 //查询期初余额
 function loadAccInit(num){
@@ -297,6 +302,7 @@ function loadAccInit(num){
             res.on('end',() => {
                 let objData = JSON.parse(rawData);
                 resolve(objData.data.items);
+                data.current_window.webContents.send("update_percent",util.calPercent());
             });
         });
     });
@@ -327,6 +333,7 @@ function accountInitial(items) {
             res.on('end', () => {
                 console.info("accountInitial result:", rawData.toString());
                 resolve();
+                data.current_window.webContents.send("update_percent",util.calPercent());
             });
         }).on('error', (e) => {
             console.error(e);
@@ -354,6 +361,7 @@ function loadVoucher() {
             res.on('end', () => {
                 let objData = JSON.parse(rawData);
                 resolve(objData.rows);
+                data.current_window.webContents.send("update_percent",util.calPercent());
             });
         }).on('error', (e) => {
             console.error(e);
@@ -388,6 +396,7 @@ function accoutVoucher(rows) {
             res.on('end', () => {
                 console.info("accoutVoucher result:", rawData.toString());
                 resolve();
+                data.current_window.webContents.send("update_percent",util.calPercent());
             });
         }).on('error', (e) => {
             console.error(e);

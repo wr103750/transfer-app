@@ -6,7 +6,8 @@ const http_ningmengyun = require('./js/http_ningmengyun.js');
 const http_kdzwy = require('./js/http_kdzwy.js');
 const http_suiyue = require("./js/http_suiyue");
 const data = require("./js/data.js");
-const util = require("./js/util")
+const util = require("./js/util");
+const Store = require("electron-store");
 // 在文件头部引入 Node.js 中的 path 模块
 const path = require('path');
 
@@ -43,9 +44,15 @@ function createWindow () {
   ipcMain.on("change-page",function (event,page){
     win.loadFile(page);
   });
+  ipcMain.on("init-remember",function(event){
+    let store = new Store();
+    if(store.get("remember")){
+      event.reply("init-response",store.get("username"),store.get("password"));
+    }
+  });
   //登录
-  ipcMain.on("login",function(event,username,password){
-    http_suiyue.login(username,password,win,event);
+  ipcMain.on("login",function(event,username,password,remember){
+    http_suiyue.login(username,password,win,event,remember);
   });
   //第三方账务平台账号测试
   ipcMain.on("accountTest",function (event,username,password,platform){
@@ -65,9 +72,16 @@ function createWindow () {
   });
   //金碟账无忧数据导入
   ipcMain.on("data_import",function(event,companys,accountingStandard,taxType){
+    win.loadFile("html/zwy_result.html");
     data.accountingStandard = accountingStandard;
     data.taxType = taxType;
+    data.current_step = 0;
+    data.account_num = companys.length;
     http_kdzwy.dataImport(event,companys);
+  });
+  //继续导账
+  ipcMain.on("continue_import",function(event){
+    win.loadFile("./html/index.html");
   });
 }
 
@@ -83,5 +97,5 @@ app.on('window-all-closed', function () {
 })
 
 ipcMain.on("dialog-message",function (event,arg){
-  dialog.showMessageBox({title:"标题",message:arg});
+  dialog.showMessageBox(data.current_window,{title:"标题",message:arg});
 });
