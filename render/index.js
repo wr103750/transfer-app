@@ -26,6 +26,7 @@ $(function(){
     soft_company.change();
 });
 window.addEventListener('DOMContentLoaded', () => {
+    window.context.usernameRequest();
 });
 
 //软件公司选择下拉框

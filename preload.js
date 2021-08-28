@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('context', {
     accountTest:(username,password,platform) => ipcRenderer.send("accountTest",username,password,platform),
     initRemember:() => ipcRenderer.send("init-remember"),
     login:(username,password,remember) => ipcRenderer.send("login",username,password,remember),
+    usernameRequest:()=> ipcRenderer.send("username-request"),
     dialog:(message) => ipcRenderer.send("dialog-message",message),
     changePage:(page) => ipcRenderer.send("change-page",page),
     kdzwyNext:() => ipcRenderer.send("kdzwy_next"),
@@ -33,6 +34,11 @@ ipcRenderer.on("login_msg",function (event,action){
     }
 });
 
+//显示当前登录的岁月用户
+ipcRenderer.on("show_username",function(event,username){
+   document.querySelector("#p_username").innerHTML="操作人:" + username;
+});
+
 //显示或者隐藏连接成功错误信息
 ipcRenderer.on("connect_msg",function(event,action){
     if(action === "success"){
@@ -53,9 +59,24 @@ ipcRenderer.on("show_kd_account_set",function(event,data){
     for(let item of items){
         html = html + `<div class="checkbox"><label><input type="checkbox" name="account_set" value="${item.companyId}" class="form-check-input" 
         data-account-date="${item.accountDate}" data-company-name="${item.companyName}" data-tax-type="${item.taxType}">${item.companyName}</label></div>`;
+
+        window.global.accountData = {
+            companyId:item.companyId,
+            companyName:item.companyName,
+            accountDate:item.accountDate,
+            taxType:item.taxType
+        };
+/*        window.context.accountData = {
+            companyId:item.companyId,
+            companyName:item.companyName,
+            accountDate:item.accountDate,
+            taxType:item.taxType
+        };*/
     }
     let span = document.getElementById("s_account_set_checkbox");
     span.innerHTML = span.innerHTML + html;
+    let companyEvent = new Event("companyEvent");
+    span.dispatchEvent(companyEvent);
 });
 
 ipcRenderer.on("update_percent",function(event,percent){

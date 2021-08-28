@@ -14,7 +14,7 @@ const path = require('path');
 // 修改现有的 createWindow() 函数
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1000,
+    width: 1200,
     height: 700,
     frame: true,
     webPreferences: {
@@ -26,11 +26,11 @@ function createWindow() {
   win.loadFile('./html/login.html');
   let content = win.webContents;
   //自动升级
-  const server = "https://transfer-app-sage.vercel.app";
+  const server = "https://app-3t684beam-wr103750.vercel.app/";
   const url = `${server}/update/${process.platform}/${app.getVersion()}`
   console.log("url:",url);
 
-  autoUpdater.setFeedURL({ url });
+/*  autoUpdater.setFeedURL({ url });
   autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
     const dialogOpts = {
       type: 'info',
@@ -43,8 +43,8 @@ function createWindow() {
     dialog.showMessageBox(dialogOpts).then((returnValue) => {
       if (returnValue.response === 0) autoUpdater.quitAndInstall()
     })
-  })
-  autoUpdater.checkForUpdates();
+  });
+  autoUpdater.checkForUpdates();*/
 
   //菜单
   const menu = new Menu()
@@ -73,6 +73,10 @@ function createWindow() {
   //登录
   ipcMain.on("login", function (event, username, password, remember) {
     http_suiyue.login(username, password, win, event, remember);
+  });
+  //显示当前登录用户
+  ipcMain.on("username-request",function(event){
+    content.send("show_username",data.loginInfo.data.name);
   });
   //第三方账务平台账号测试
   ipcMain.on("accountTest", function (event, username, password, platform) {
