@@ -1,4 +1,6 @@
 $(function(){
+    //请求获取当前登录用户
+    window.context.usernameRequest();
     let companyData = new Array();
     //账套数据初始化
     $("#s_account_set_checkbox").on("companyEvent",function (){

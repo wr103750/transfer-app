@@ -10,7 +10,7 @@
     display: none;
 }
 #s_account_set_checkbox{
-    height: 400px;
+    height: 300px;
     overflow: auto;
 }
 /**zwy_result.html**/
@@ -21,6 +21,5 @@
     background-color:#eeeeee;
 }
 .head-user{
-    padding: auto;
     height:40px;
 }

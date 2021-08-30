@@ -25,6 +25,7 @@ $(function(){
     soft_product.change(productChange);
     soft_company.change();
 });
+//请求获取当前登录用户
 window.addEventListener('DOMContentLoaded', () => {
     window.context.usernameRequest();
 });

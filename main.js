@@ -14,8 +14,8 @@ const path = require('path');
 // 修改现有的 createWindow() 函数
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1200,
-    height: 700,
+    width: 1120,
+    height: 640,
     frame: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
