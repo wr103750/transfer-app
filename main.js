@@ -26,11 +26,11 @@ function createWindow() {
   win.loadFile('./html/login.html');
   let content = win.webContents;
   //自动升级
-  const server = "https://app-3t684beam-wr103750.vercel.app/";
+  const server = "http://127.0.0.1:5000/update";
   const url = `${server}/update/${process.platform}/${app.getVersion()}`
   console.log("url:",url);
 
-/*  autoUpdater.setFeedURL({ url });
+  autoUpdater.setFeedURL({ url });
   autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
     const dialogOpts = {
       type: 'info',
@@ -44,7 +44,7 @@ function createWindow() {
       if (returnValue.response === 0) autoUpdater.quitAndInstall()
     })
   });
-  autoUpdater.checkForUpdates();*/
+  autoUpdater.checkForUpdates();
 
   //菜单
   const menu = new Menu()
