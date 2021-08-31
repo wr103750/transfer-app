@@ -1,4 +1,4 @@
-const { app, BrowserWindow, autoUpdater } = require('electron');
+const { app, BrowserWindow, autoUpdater,globalShortcut  } = require('electron');
 const { Menu, MenuItem, dialog } = require('electron');
 const ipcMain = require('electron').ipcMain;
 const { Notification } = require('electron');
@@ -30,7 +30,7 @@ function createWindow() {
   const url = `${server}/update/${process.platform}/${app.getVersion()}`
   console.log("url:",url);
 
-  autoUpdater.setFeedURL({ url });
+/*  autoUpdater.setFeedURL({ url });
   autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
     const dialogOpts = {
       type: 'info',
@@ -44,21 +44,29 @@ function createWindow() {
       if (returnValue.response === 0) autoUpdater.quitAndInstall()
     })
   });
-  autoUpdater.checkForUpdates();
+  autoUpdater.checkForUpdates();*/
 
   //菜单
-  const menu = new Menu()
+/*  const menu = new Menu()
   menu.append(new MenuItem({
     label: '菜单',
+    visible:false,
     submenu: [{
       label: "调试",
+      visible:false,
       accelerator: process.platform === 'darwin' ? 'Alt+Cmd+I' : 'F12',
       click: () => {
         content.openDevTools();
       }
     }]
-  }));
-  Menu.setApplicationMenu(menu);
+  }));*/
+  Menu.setApplicationMenu(null);
+
+  //隐藏菜单并且设置打开调试工具的快捷键为ctrl + F12
+  globalShortcut.register('ctrl + F12', () => {
+    content.openDevTools();
+  });
+
 
   //页面切换
   ipcMain.on("change-page", function (event, page) {

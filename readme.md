@@ -7,14 +7,14 @@
 - preload.js，也是采用node.js编写，但是比较特殊，electron应用在加载静态页面的时候，同时也加载preload.js，用于前端页面和后台通信，比如：前端提交了表单数据，需要将数据传送到后台处理；或者后台将处理的结果返回给前端页面展示。
 
 ## 2.业务和逻辑
-代码文件说明：
-html/login.html 登录岁月会计云页面
-html/index.html 选择要导入的第三方财务软件
-html/zwy_config.html 选择账无忧账套和配置
-Html/zwy_result.html 账无忧导入结果
-Js/data.js 用于存储一些全局变量数据
-Js/http_kdzwy.js从账无忧抓取数据的主要业务逻辑
-Js/http_ningmengyun.js 从柠檬云抓取数据的主要业务逻辑（本期先不做柠檬云的）
+代码文件说明：  
+html/login.html 登录岁月会计云页面  
+html/index.html 选择要导入的第三方财务软件  
+html/zwy_config.html 选择账无忧账套和配置  
+Html/zwy_result.html 账无忧导入结果  
+Js/data.js 用于存储一些全局变量数据  
+Js/http_kdzwy.js从账无忧抓取数据的主要业务逻辑  
+Js/http_ningmengyun.js   从柠檬云抓取数据的主要业务逻辑（本期先不做柠檬云的）  
 Js/util.js 业务用到的工具类
 
 业务流程：
@@ -58,3 +58,10 @@ autoUpdater.setFeedURL({ url })
 ### 4.3.Hazel 
 这种方式是将升级服务部署到云端，应用的源码需要上传到github，并且授权给云端服务器，当应用的源码有更新时，云端服务器可以拿到这些更新并且推送给客户端应用。
 项目地址：https://github.com/vercel/hazel
+# 参考文档
+- 官方：https://www.electronjs.org/docs
+- w3cschool:https://www.w3cschool.cn/electronmanual/
+- 腾讯课堂1：https://ke.qq.com/course/455645?taid=4035126070014941
+- 腾讯课堂2：https://ke.qq.com/course/467628
+- 慕课网：https://www.imooc.com/learn/1198
+- 腾讯云文档：https://cloud.tencent.com/developer/doc/1070
